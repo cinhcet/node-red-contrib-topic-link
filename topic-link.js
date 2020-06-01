@@ -58,7 +58,12 @@ module.exports = function(RED) {
     
     linkInNodes.add(node);
 
-    connectNodes();
+    for(let linkOutNode of linkOutNodes) {
+      if(matchTopic(linkOutNode.topic, node.topic)) {
+        node.connectedNodes.add(linkOutNode);
+        linkOutNode.connectedNodes.add(node);
+      }
+    }
 
     node.on('close', function() {
       linkInNodes.delete(node);
@@ -78,7 +83,12 @@ module.exports = function(RED) {
 
     linkOutNodes.add(node);
 
-    connectNodes();
+    for(let linkInNode of linkInNodes) {
+      if(matchTopic(node.topic, linkInNode.topic)) {
+        linkInNode.connectedNodes.add(node);
+        node.connectedNodes.add(linkInNode);
+      }
+    }
 
     node.on('input', function(m, send, done) {
       node.connectedNodes.forEach(function(n) {
@@ -91,6 +101,9 @@ module.exports = function(RED) {
 
     node.on('close', function() {
       linkOutNodes.delete(node);
+      node.connectedNodes.forEach(function(n) {
+        n.connectedNodes.delete(node);
+      });
     });
   }
   RED.nodes.registerType("topic-link out", topicLinkOut);
