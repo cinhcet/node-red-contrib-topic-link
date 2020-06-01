@@ -1,0 +1,26 @@
+{
+  "name": "node-red-contrib-topic-link",
+  "version": "0.0.1",
+  "description": "",
+  "node-red": {
+    "nodes": {
+      "topic-link": "topic-link.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cinhcet/node-red-contrib-topic-link.git"
+  },
+  "keywords": [
+    "node-red",
+    "link",
+    "topic",
+    "wildcard"
+  ],
+  "author": "cinhcet",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cinhcet/node-red-contrib-topic-link/issues"
+  },
+  "homepage": "https://github.com/cinhcet/node-red-contrib-topic-link#readme"
+}
