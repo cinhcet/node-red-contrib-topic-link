@@ -38,6 +38,7 @@ module.exports = function(RED) {
     return aSplit.length == bSplit.length;
   }
 
+  /*
   function connectNodes() {
     for(let linkInNode of linkInNodes) {
       for(let linkOutNode of linkOutNodes) {
@@ -47,11 +48,12 @@ module.exports = function(RED) {
         }
       }
     }
-  }
+  }*/
 
   function topicLinkIn(config) {
     RED.nodes.createNode(this, config);
     var node = this;
+    node.config = config;
     node.topic = config.topic;
 
     node.connectedNodes = new Set();
@@ -81,21 +83,34 @@ module.exports = function(RED) {
     node.topic = config.topic;
     node.connectedNodes = new Set();
 
-    linkOutNodes.add(node);
+    if(node.topic !== '') {
+      linkOutNodes.add(node);
 
-    for(let linkInNode of linkInNodes) {
-      if(matchTopic(node.topic, linkInNode.topic)) {
-        linkInNode.connectedNodes.add(node);
-        node.connectedNodes.add(linkInNode);
+      for(let linkInNode of linkInNodes) {
+        if(matchTopic(node.topic, linkInNode.topic)) {
+          linkInNode.connectedNodes.add(node);
+          node.connectedNodes.add(linkInNode);
+        }
       }
     }
 
     node.on('input', function(m, send, done) {
-      node.connectedNodes.forEach(function(n) {
-        n.send(m);
-      });
-      if(done) {
+      if(node.topic !== '') {
+        node.connectedNodes.forEach(function(n) {
+          if(n.config.appendTopic === true) {
+            m.topic = node.topic;
+          }
+          n.send(m);
+        });
         done();
+      } else if(m.topic !== '') {
+        for(let linkInNode of linkInNodes) {
+          if(matchTopic(m.topic, linkInNode.topic)) {
+            linkInNode.send(m);
+          }
+        }
+      } else {
+        done('neither the topic has been configured or the topic property of the message is set');
       }
     });
 

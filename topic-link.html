@@ -17,11 +17,14 @@
 <script type="text/javascript">
   RED.nodes.registerType('topic-link in', {
     category: 'Topic Link',
-    color: '#2196F3',
+    color: '#9494b8',
     defaults: {
       topic: {
         value: "",
         required: true
+      },
+      appendTopic: {
+        value: true
       },
       name: {
         value: ""
@@ -29,7 +32,7 @@
     },
     inputs: 0,
     outputs: 1,
-    icon: "hash.png",
+    icon: "fa-arrow-right",
     label: function() {
       return this.name || this.topic;
     }, 
@@ -43,18 +46,21 @@
     <input type="text" id="node-input-topic" placeholder="Topic">
   </div>
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <label for="node-input-appendTopic" style="width:auto">Set parsed topic property</label>
+    <input type="checkbox" id="node-input-appendTopic" style="display:inline-block; width:auto; vertical-align:top;">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="topic-link in">
-  <p></p>
+  <p>Receives messages from <code>topic-link in</code> nodes when the topic matches</p>
+  <p>The topic can contain wildcards <code>+</code> and <code>#</code></p>
+  <p>Example topic: <code>home/sensors/#</code></p>
+  <p>Example topic: <code>home/+/instance1</code></p>
 </script>
-
-
-
-
 
 
 
@@ -65,11 +71,10 @@
 <script type="text/javascript">
   RED.nodes.registerType('topic-link out', {
     category: 'Topic Link',
-    color: '#2196F3',
+    color: '#9494b8',
     defaults: {
       topic: {
-        value: "",
-        required: true
+        value: ""
       },
       name: {
         value: ""
@@ -77,7 +82,7 @@
     },
     inputs: 1,
     outputs: 0,
-    icon: "hash.png",
+    icon: "fa-arrow-right",
     label: function() {
       return this.name || this.topic;
     }, 
@@ -91,11 +96,18 @@
     <input type="text" id="node-input-topic" placeholder="Topic">
   </div>
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="topic-link out">
-  <p></p>
+  <p>Sends message to all <code>topic-link in</code> nodes with a matching topic</p>
+  <p>Example topic: <code>home/sensors/instance1</code></p>
+  <p>Example topic: <code>home/actors/instance1</code></p>
+  <p>
+    If the message has a <code>topic</code> property and the topic of the node configuration is
+    empty, then the topic from the message is chosen. This is less efficient than
+    pre-specifying the topic.
+  </p>
 </script>
