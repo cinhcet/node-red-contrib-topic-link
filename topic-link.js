@@ -27,7 +27,7 @@ module.exports = function(RED) {
     var aSplit = a.split('/');
     var bSplit = b.split('/');
 
-    for(let i = 0; i < aSplit.length; i++) {
+    for(let i = 0; i < aSplit.length + 1; i++) {
       if(bSplit[i] == '#') {
         return true;
       } else if(bSplit[i] != '+' && bSplit[i] != aSplit[i]) {
