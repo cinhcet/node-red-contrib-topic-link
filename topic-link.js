@@ -109,6 +109,7 @@ module.exports = function(RED) {
             linkInNode.send(m);
           }
         }
+        done();
       } else {
         done('neither the topic has been configured or the topic property of the message is set');
       }
