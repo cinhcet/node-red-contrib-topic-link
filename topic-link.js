@@ -39,10 +39,6 @@ module.exports = function(RED) {
         linkOutNode.connectedNodes.set(node, inferredTopic);
       }
     }
-    
-    node.on('input', function(msg) {
-      node.send(msg);
-    });
 
     node.on('close', function() {
       linkInNodes.delete(node);
