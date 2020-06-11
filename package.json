@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-topic-link",
-  "version": "0.0.4",
-  "description": "",
+  "version": "0.1.0",
+  "description": "A link node with MQTT like wildcards",
   "node-red": {
     "nodes": {
       "topic-link": "topic-link.js"

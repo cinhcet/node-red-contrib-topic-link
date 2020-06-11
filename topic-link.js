@@ -20,35 +20,7 @@ module.exports = function(RED) {
   var linkInNodes = new Set();
   var linkOutNodes = new Set();
 
-  function matchTopic(a, b) {
-    if(a == b) return true;
-    if(b == '#') return true;
-
-    var aSplit = a.split('/');
-    var bSplit = b.split('/');
-
-    for(let i = 0; i < aSplit.length + 1; i++) {
-      if(bSplit[i] == '#') {
-        return true;
-      } else if(bSplit[i] != '+' && bSplit[i] != aSplit[i]) {
-        return false;
-      }
-    } 
-
-    return aSplit.length == bSplit.length;
-  }
-
-  /*
-  function connectNodes() {
-    for(let linkInNode of linkInNodes) {
-      for(let linkOutNode of linkOutNodes) {
-        if(matchTopic(linkOutNode.topic, linkInNode.topic)) {
-          linkInNode.connectedNodes.add(linkOutNode);
-          linkOutNode.connectedNodes.add(linkInNode);
-        }
-      }
-    }
-  }*/
+  const matchTopic = require('./topicMatch');
 
   function topicLinkIn(config) {
     RED.nodes.createNode(this, config);
@@ -61,11 +33,16 @@ module.exports = function(RED) {
     linkInNodes.add(node);
 
     for(let linkOutNode of linkOutNodes) {
-      if(matchTopic(linkOutNode.topic, node.topic)) {
+      let inferredTopic = matchTopic(linkOutNode.topic, node.topic);
+      if(inferredTopic) {
         node.connectedNodes.add(linkOutNode);
-        linkOutNode.connectedNodes.add(node);
+        linkOutNode.connectedNodes.set(node, inferredTopic);
       }
     }
+    
+    node.on('input', function(msg) {
+      node.send(msg);
+    });
 
     node.on('close', function() {
       linkInNodes.delete(node);
@@ -81,32 +58,37 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     var node = this;
     node.topic = config.topic;
-    node.connectedNodes = new Set();
+    node.connectedNodes = new Map();
 
     if(node.topic !== '') {
       linkOutNodes.add(node);
 
       for(let linkInNode of linkInNodes) {
-        if(matchTopic(node.topic, linkInNode.topic)) {
+        let inferredTopic = matchTopic(node.topic, linkInNode.topic);
+        if(inferredTopic) {
           linkInNode.connectedNodes.add(node);
-          node.connectedNodes.add(linkInNode);
+          node.connectedNodes.set(linkInNode, inferredTopic);
         }
       }
     }
 
     node.on('input', function(m, send, done) {
       if(node.topic !== '') {
-        node.connectedNodes.forEach(function(n) {
+        for(let [n, topic] of node.connectedNodes) {
+          let sendMsg = node.connectedNodes.size == 1 ? m : RED.util.cloneMessage(m);
           if(n.config.appendTopic === true) {
-            m.topic = node.topic;
+            sendMsg.topic = topic;
           }
-          n.send(m);
-        });
+          n.send(sendMsg);
+        }
         done();
       } else if(m.topic !== '') {
         for(let linkInNode of linkInNodes) {
-          if(matchTopic(m.topic, linkInNode.topic)) {
-            linkInNode.send(m);
+          let inferredTopic = matchTopic(m.topic, linkInNode.topic);
+          if(inferredTopic) {
+            let sendMsg = linkInNodes.size == 1 ? m : RED.util.cloneMessage(m);
+            sendMsg.topic = inferredTopic;
+            linkInNode.send(sendMsg);
           }
         }
         done();

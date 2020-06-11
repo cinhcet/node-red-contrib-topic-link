@@ -57,7 +57,12 @@
 
 <script type="text/x-red" data-help-name="topic-link in">
   <p>Receives messages from <code>topic-link in</code> nodes when the topic matches</p>
-  <p>The topic can contain wildcards <code>+</code> and <code>#</code></p>
+  <p>The topic can contain wildcards <code>+</code> and <code>#</code> similar to MQTT</p>
+  <p>
+    If the option <code>Set parsed topic property</code> is checked, then the topic property
+    of the resulting message is set to the inferred topic, meaning the topic where the wildcards
+    have been resolved. Note that this overwrites an already existing topic property.
+  </p>
   <p>Example topic: <code>home/sensors/#</code></p>
   <p>Example topic: <code>home/+/instance1</code></p>
 </script>
@@ -104,10 +109,20 @@
 
 <script type="text/x-red" data-help-name="topic-link out">
   <p>Sends message to all <code>topic-link in</code> nodes with a matching topic</p>
+  <p>
+    In addition to MQTT topic rules, this node also allows to broadcast messages
+    by publishing with the wildcard <code>+</code> in the topic (see examples below).
+  </p>
   <p>Example topic: <code>home/sensors/instance1</code></p>
   <p>Example topic: <code>home/actors/instance1</code></p>
   <p>
-    If the message has a <code>topic</code> property and the topic of the node configuration is
+    Example topic with wildcard publishing: 
+    <code>home/+/control</code>.
+    This will be received by all <code>topic-link in</code> nodes with
+    topic <code>home/ARBITRARY/control</code> where ARBITRARY is any string.
+  </p>
+  <p>
+    If the message has a <code>topic</code> property AND the topic of the node configuration is
     empty, then the topic from the message is chosen. This is less efficient than
     pre-specifying the topic.
   </p>
