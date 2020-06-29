@@ -44,6 +44,7 @@ module.exports = function(RED) {
 
     node.on('input', function(m, send, done) {
       if(m.topic !== "") {
+        node.topic = m.topic;
         node.connectedNodes.forEach(function(n) {
           n.connectedNodes.delete(node);
         });
