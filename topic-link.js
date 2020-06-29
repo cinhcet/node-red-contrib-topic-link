@@ -29,16 +29,36 @@ module.exports = function(RED) {
     node.topic = config.topic;
 
     node.connectedNodes = new Set();
-    
+
     linkInNodes.add(node);
 
-    for(let linkOutNode of linkOutNodes) {
-      let inferredTopic = matchTopic(linkOutNode.topic, node.topic);
-      if(inferredTopic) {
-        node.connectedNodes.add(linkOutNode);
-        linkOutNode.connectedNodes.set(node, inferredTopic);
+    if(config.topic !== "") {
+      for(let linkOutNode of linkOutNodes) {
+        let inferredTopic = matchTopic(linkOutNode.topic, node.topic);
+        if(inferredTopic) {
+          node.connectedNodes.add(linkOutNode);
+          linkOutNode.connectedNodes.set(node, inferredTopic);
+        }
       }
     }
+
+    node.on('input', function(m, send, done) {
+      if(m.topic !== "") {
+        node.connectedNodes.forEach(function(n) {
+          n.connectedNodes.delete(node);
+        });
+        for(let linkOutNode of linkOutNodes) {
+          let inferredTopic = matchTopic(linkOutNode.topic, m.topic);
+          if(inferredTopic) {
+            node.connectedNodes.add(linkOutNode);
+            linkOutNode.connectedNodes.set(node, inferredTopic);
+          }
+        }
+        done();
+      } else {
+        done('topic not set');
+      }
+    });
 
     node.on('close', function() {
       linkInNodes.delete(node);

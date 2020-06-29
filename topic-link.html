@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2020 cinhcet
- 
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -20,8 +20,7 @@
     color: '#9494b8',
     defaults: {
       topic: {
-        value: "",
-        required: true
+        value: ""
       },
       appendTopic: {
         value: true
@@ -30,12 +29,12 @@
         value: ""
       },
     },
-    inputs: 0,
+    inputs: 1,
     outputs: 1,
     icon: "fa-arrow-right",
     label: function() {
       return this.name || this.topic;
-    }, 
+    },
     paletteLabel: 'topic link in'
   });
 </script>
@@ -91,7 +90,7 @@
     icon: "fa-arrow-right",
     label: function() {
       return this.name || this.topic;
-    }, 
+    },
     paletteLabel: 'topic link out'
   });
 </script>
@@ -116,7 +115,7 @@
   <p>Example topic: <code>home/sensors/instance1</code></p>
   <p>Example topic: <code>home/actors/instance1</code></p>
   <p>
-    Example topic with wildcard publishing: 
+    Example topic with wildcard publishing:
     <code>home/+/control</code>.
     This will be received by all <code>topic-link in</code> nodes with
     topic <code>home/ARBITRARY/control</code> where ARBITRARY is any string.
